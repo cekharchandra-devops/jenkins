@@ -1,0 +1,89 @@
+pipeline {
+    agent any // Run on any available agent
+    environment {
+        // Set environment variables
+        MAVEN_HOME = "/usr/local/maven"
+        JAVA_HOME = "/usr/lib/jvm/java-11-openjdk"
+        DOCKER_IMAGE = "myapp:latest"
+        K8S_DEPLOYMENT_FILE = "k8s/deployment.yaml"
+    }
+    options {
+        timeout(time: 30, unit: 'MINUTES') // Timeout for pipeline
+        buildDiscarder(logRotator(numToKeepStr: '5')) // Retain only the last 5 builds
+        skipDefaultCheckout() // Skip default source checkout
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out source code...'
+                checkout scm // Default SCM configuration
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the application with Maven...'
+                sh "${MAVEN_HOME}/bin/mvn clean package"
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                echo 'Running Unit Tests...'
+                sh "${MAVEN_HOME}/bin/mvn test"
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml' // Publish test reports
+                }
+            }
+        }
+        stage('Static Code Analysis') {
+            steps {
+                echo 'Analyzing code with SonarQube...'
+                withSonarQubeEnv('SonarQube') {
+                    sh "${MAVEN_HOME}/bin/mvn sonar:sonar"
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker Image...'
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
+        }
+        stage('Run Integration Tests') {
+            steps {
+                echo 'Running Integration Tests in Docker Container...'
+                sh "docker run --rm ${DOCKER_IMAGE} /bin/sh -c 'run_integration_tests.sh'"
+            }
+        }
+        stage('Approval') {
+            steps {
+                echo 'Awaiting deployment approval...'
+                input message: 'Do you want to deploy?', ok: 'Deploy'
+            }
+        }
+        stage('Deploy') {
+            when {
+                branch 'main' // Deploy only on main branch
+            }
+            steps {
+                echo 'Deploying the application to Kubernetes...'
+                sh "kubectl apply -f ${K8S_DEPLOYMENT_FILE}"
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+            mail to: 'team@example.com',
+                 subject: "Build Successful: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                 body: "The pipeline completed successfully. Deployment was successful."
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for details.'
+            mail to: 'team@example.com',
+                 subject: "Build Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                 body: "The pipeline failed. Investigate the issue in Jenkins logs."
+        }
+    }
+}
