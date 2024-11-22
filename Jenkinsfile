@@ -3,8 +3,9 @@ pipeline {
         label 'AGENT-1'
     }
     options{
-        timeout(time: 10, unit: 'SECONDS')
+        timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         disableConcurrentBuilds()
+         retry(3)
     }
     stages {
         stage('Build') {
@@ -21,6 +22,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'echo Deploy..........'
+                error 'pipeline failed'
             }
         }
     }
