@@ -6,7 +6,7 @@ pipeline {
     }
     stages {
         stage('Build') {
-            steps {
+            script {
                 sh 'echo build..........'
                 sh sleep 10
             }
