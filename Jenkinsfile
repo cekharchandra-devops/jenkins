@@ -1,9 +1,14 @@
 pipeline {
     agent any
+    options{
+        timeout(time: 10, unit: 'SECONDS')
+        disableConcurrentBuilds()
+    }
     stages {
         stage('Build') {
             steps {
                 sh 'echo build..........'
+                sh sleep 10
             }
         }
         stage('Test') {
@@ -15,6 +20,12 @@ pipeline {
             steps {
                 sh 'echo Deploy..........'
             }
+        }
+    }
+     post { 
+        always { 
+            echo 'I will always say Hello again!'
+            deleteDir()
         }
     }
 }
