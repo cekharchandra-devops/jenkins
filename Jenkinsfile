@@ -3,7 +3,7 @@ pipeline {
         label 'AGENT-1'
     }
     options { 
-        timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
+        //timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         disableConcurrentBuilds()
         retry(3)
     }
@@ -22,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'echo build..........'
-                // sh 'sleep 10'
+                sh 'sleep 10'
             }
         }
         stage('Test') {
