@@ -6,6 +6,7 @@ pipeline {
         //timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         disableConcurrentBuilds()
         retry(3)  //job must be failed to see this feature executes added error statement in stage(Deploy)
+        buildDiscarder(logRotator(numToKeepStr: '3'))
     }
     //  parameters {
     //     string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
