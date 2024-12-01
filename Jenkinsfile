@@ -33,7 +33,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'echo Deploy..........'
-                //error 'pipeline failed'
+                error 'pipeline failed'
                }
         }
         // stage('Print Params'){
