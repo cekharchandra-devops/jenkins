@@ -5,7 +5,8 @@ pipeline {
     options { 
         timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         disableConcurrentBuilds()
-        //retry(3)}
+        //retry(3)
+    }
     //  parameters {
     //     string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
 
