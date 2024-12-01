@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label AGENT-1
+    }
         // timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         // disableConcurrentBuilds()
         //  retry(3)
@@ -55,3 +57,101 @@ pipeline {
         }
     }
 }
+
+// pipeline {
+//     // Define pipeline-level parameters
+//     parameters {
+//         string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
+//         booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run unit tests')
+//     }
+
+//     // Define agent (where the pipeline runs)
+//     agent {
+//         label 'linux-node'
+//     }
+
+//     options {
+//         // Keep logs for a specific duration
+//         buildDiscarder(logRotator(numToKeepStr: '10'))
+//         timeout(time: 30, unit: 'MINUTES') // Timeout for the pipeline
+//     }
+
+//     environment {
+//         // Environment variables for all stages
+//         JAVA_HOME = '/usr/lib/jvm/java-11'
+//         PATH = "${JAVA_HOME}/bin:${env.PATH}"
+//     }
+
+//     triggers {
+//         // Build triggers
+//         pollSCM('H/5 * * * *') // Poll for changes every 5 minutes
+//     }
+
+//     stages {
+//         stage('Pre-Build') {
+//             steps {
+//                 echo 'Pre-Build stage - Validating setup'
+//                 script {
+//                     // Example pre-build checks
+//                     if (!fileExists('Jenkinsfile')) {
+//                         error('Jenkinsfile not found!')
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Checkout Code') {
+//             steps {
+//                 git branch: params.BRANCH, url: 'https://github.com/example/repo.git'
+//             }
+//         }
+
+//         stage('Build') {
+//             steps {
+//                 echo 'Building the application'
+//                 sh './gradlew    ' // Example build command
+//             }
+//         }
+
+//         stage('Run Tests') {
+//             when {
+//                 expression { params.RUN_TESTS }
+//             }
+//             steps {
+//                 echo 'Running tests'
+//                 sh './gradlew test'
+//             }
+//         }
+
+//         stage('Deploy to Staging') {
+//             steps {
+//                 echo 'Deploying to staging environment'
+//                 sh 'kubectl apply -f k8s/deployment.yaml'
+//             }
+//         }
+//     }
+
+//     post {
+//         // Actions after pipeline completion
+//         always {
+//             echo 'Pipeline finished. Cleaning up workspace.'
+//             deleteDir() // Clean workspace
+//         }
+//         success {
+//             echo 'Pipeline succeeded!'
+//             emailext(
+//                 subject: 'Jenkins Build SUCCESS: Job ${env.JOB_NAME}',
+//                 body: 'Good news! The build was successful.',
+//                 to: 'team@example.com'
+//             )
+//         }
+//         failure {
+//             echo 'Pipeline failed!'
+//             emailext(
+//                 subject: 'Jenkins Build FAILURE: Job ${env.JOB_NAME}',
+//                 body: 'The build has failed. Please check Jenkins for details.',
+//                 to: 'team@example.com'
+//             )
+//         }
+//     }
+// }
