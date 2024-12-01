@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label AGENT-1
+        label 'AGENT-1'
     }
         // timeout(time: 10, unit: 'SECONDS') // job gets failed if it executes even after 10 secs
         // disableConcurrentBuilds()
