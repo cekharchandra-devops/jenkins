@@ -16,6 +16,6 @@ sudo systemctl enable jenkins
 **Continous Integration**
 ***Continuous Integration (CI) is a software development practice where developers frequently merge their code changes into a shared repository. After each merge, the code is automatically built and tested to catch errors early. ***
 
-How It Works
-
 Jenkins Plugins:
+
+pipeline stage view
